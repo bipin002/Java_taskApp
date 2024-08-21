@@ -2,7 +2,9 @@ package com.taskfusion.taskApp.config;
 
 import com.taskfusion.taskApp.Utility.JwtToken;
 import com.taskfusion.taskApp.models.UserTbl;
+import com.taskfusion.taskApp.models.roletbl;
 import com.taskfusion.taskApp.services.GetUserDetails;
+import com.taskfusion.taskApp.services.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -38,9 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //    private  JwtToken _jwtToken;
     @Autowired
     private GetUserDetails _getUserDetails;
+    @Autowired
+    private UserRole _userrole;
     private final String secretKey = "5171488efc1d8a4f2f07edc493851cbeb6adf7238e8e46964f04c8216116de87"; // Replace with your actual secret key
     //    private final Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-    private final Key key =  Keys.hmacShaKeyFor(secretKey.getBytes());//JwtToken.getSecurekey();//Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key = Keys.hmacShaKeyFor(secretKey.getBytes());//JwtToken.getSecurekey();//Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
 //    public JwtAuthenticationFilter(GetUserDetails getUserDetails,JwtToken jwtToken, HandlerExceptionResolver handlerExceptionResolver) {
 //        this._jwtToken = jwtToken;
@@ -65,15 +69,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = claims.getSubject();
                 if (username != null) {
                     UserTbl userdetails = _getUserDetails.getUserDetails(username);
-
+//
                     List<GrantedAuthority> authorities = new ArrayList<>();
-                    String role = "Admin";
-                    if (role != null) {
-                        authorities.add(new SimpleGrantedAuthority("Role_" + role));
+                    roletbl role = _userrole.FindRoleByUserId(userdetails.getRoleId());//"Admin";
+                    if (role != null && role.getRole_name().equals("Admin")) {
+                        authorities.add(new SimpleGrantedAuthority("Role_" + role.getRole_name()));
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(userdetails, null, authorities);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } else {
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(userdetails, null);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(userdetails, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    //response.setStatus(HttpServletResponse.SC_OK);
+//                    response.setStatus(HttpServletResponse.SC_OK);
+                    //response.setStatus(200);
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 }

@@ -6,23 +6,23 @@ import jakarta.persistence.Id;
 @Entity
 public class roletbl {
     @Id
-    private Integer roleid;
-    private String rolename;
+    private Integer role_id;
+    private String role_name;
 
-    public Integer getRoleid() {
-        return roleid;
+    public Integer getRole_id() {
+        return role_id;
     }
 
-    public void setRoleid(Integer roleid) {
-        this.roleid = roleid;
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
     }
 
-    public String getRolename() {
-        return rolename;
+    public String getRole_name() {
+        return role_name;
     }
 
-    public void setRolename(String rolename) {
-        this.rolename = rolename;
+    public void setRole_name(String role_name) {
+        this.role_name = role_name;
     }
 
     public Boolean getStatus() {
